@@ -12,6 +12,11 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [8, 9, 10, 11, 12, 13, 14, 15, 16, 24]
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -21,8 +26,20 @@ jobs:
     #   run: ./build
     #   working-directory: ${{ github.workspace }}
 
-    - name: Install Node.js
-      uses: actions/setup-node@v3
+    - name: Download the latest release binary of fnm
+      run: |
+        curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
+
+    - name: Install test Node.js ${{ matrix.node-version }} via fnm
+      run: |
+        export PATH="$HOME/.local/share/fnm:$PATH"
+        eval "$(fnm env)"
+        fnm install ${{ matrix.node-version }}
+        TEST_NODE_PATH=$(fnm exec --using=${{ matrix.node-version }} which node)
+        echo "TEST_NODE_PATH=$TEST_NODE_PATH" >> $GITHUB_ENV
+
+    - name: Install Node.js 16 for npm
+      uses: actions/setup-node@v4
       with:
         node-version: '16'
 

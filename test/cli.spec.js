@@ -48,10 +48,12 @@ async function computeChecksum(filePath) {
 }
 
 const baseDir = path.resolve(__dirname, "..");
+const testNodePath = process.env.TEST_NODE_PATH || "node";
+
 function run7z(args) {
-    return child_process.spawnSync("node", [path.join(baseDir, "cli.js"), ...args], {
+    return child_process.spawnSync(testNodePath, [path.join(baseDir, "cli.js"), ...args], {
         cwd: baseDir,
-        timeout: 5000
+        timeout: 30000
     });
 }
 
