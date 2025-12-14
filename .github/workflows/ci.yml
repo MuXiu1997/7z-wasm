@@ -47,6 +47,13 @@ jobs:
       run: npm install
       working-directory: ${{ github.workspace }}
 
+    - name: Transpile for legacy Node.js
+      if: matrix.node-version < 16
+      run: |
+        npx babel 7zz.umd.js --out-file 7zz.umd.js
+        npx babel cli.js --out-file cli.js
+      working-directory: ${{ github.workspace }}
+
     - name: Run tests
       run: npm test
       working-directory: ${{ github.workspace }}
